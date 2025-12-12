@@ -8,67 +8,47 @@ import numpy as np
 
 
 def chebyshev_nodes(n: int = 10) -> np.ndarray | None:
-    """Funkcja generująca wektor węzłów Czebyszewa drugiego rodzaju (n,) 
-    i sortująca wynik od najmniejszego do największego węzła.
-
-    Args:
-        n (int): Liczba węzłów Czebyszewa.
-    
-    Returns:
-        (np.ndarray): Wektor węzłów Czebyszewa (n,).
-        Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
-    """
-    pass
-
+    if not isinstance(n, int) or n <= 0:
+        return None
+    if n == 1:
+        return np.array([1.0])
+    k = np.arange(n)
+    return np.cos(np.pi * k / (n - 1))
 
 def bar_cheb_weights(n: int = 10) -> np.ndarray | None:
-    """Funkcja tworząca wektor wag dla węzłów Czebyszewa wymiaru (n,).
+    w = np.zeros(n)
 
-    Args:
-        n (int): Liczba wag węzłów Czebyszewa.
-    
-    Returns:
-        (np.ndarray): Wektor wag dla węzłów Czebyszewa (n,).
-        Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
-    """
-    pass
+    if not isinstance(n, int) or n<=0:
+        return None
+    for j in range(n):
+        if j == 0 or j == n-1:
+            w[j] = ((-1)**j)*1/2
+        else:
+            w[j]=((-1)**j)*1
+    return w
 
 
 def barycentric_inte(
     xi: np.ndarray, yi: np.ndarray, wi: np.ndarray, x: np.ndarray
 ) -> np.ndarray | None:
-    """Funkcja przeprowadza interpolację metodą barycentryczną dla zadanych 
-    węzłów xi i wartości funkcji interpolowanej yi używając wag wi. Zwraca 
-    wyliczone wartości funkcji interpolującej dla argumentów x w postaci 
-    wektora (n,).
+    if not isinstance(xi, np.ndarray) or not isinstance(yi, np.ndarray) or not isinstance(wi, np.ndarray) or not isinstance(x, np.ndarray):
+        return None
+    p = np.zeros_like(x, dtype=float)
 
-    Args:
-        xi (np.ndarray): Wektor węzłów interpolacji (m,).
-        yi (np.ndarray): Wektor wartości funkcji interpolowanej w węzłach (m,).
-        wi (np.ndarray): Wektor wag interpolacji (m,).
-        x (np.ndarray): Wektor argumentów dla funkcji interpolującej (n,).
-    
-    Returns:
-        (np.ndarray): Wektor wartości funkcji interpolującej (n,).
-        Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
-    """
-    pass
+    for j, xj in enumerate(x):
+        diff = xj - xi
+
+        if np.any(diff == 0):
+            p[j] = yi[diff == 0][0]
+        else:
+            numerator = np.sum(wi * yi / diff)
+            denominator = np.sum(wi / diff)
+            p[j] = numerator / denominator
+
+    return p
 
 
 def L_inf(
     xr: int | float | list | np.ndarray, x: int | float | list | np.ndarray
 ) -> float | None:
-    """Funkcja obliczająca normę L-nieskończoność. Powinna działać zarówno na 
-    wartościach skalarnych, listach, jak i wektorach biblioteki numpy.
-
-    Args:
-        xr (int | float | list | np.ndarray): Wartość dokładna w postaci 
-            skalara, listy lub wektora (n,).
-        x (int | float | list | np.ndarray): Wartość przybliżona w postaci 
-            skalara, listy lub wektora (n,).
-
-    Returns:
-        (float): Wartość normy L-nieskończoność.
-        Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
-    """
-    pass
+    return np.max(np.abs(np.array(xr)-np.array(x)))
